@@ -16,7 +16,7 @@ const CadastrarPage = () => {
         if (nome.trim() === "" || usuario.trim() === "" || senha.trim() === "") {
             Swal.fire("Erro", "Por favor, preencha todos os campos.", "error");
         } else if (!emailValidation.test(usuario)) {
-            Swal.fire("Erro", "Por favor, insira um usuário válido.", "error");
+            Swal.fire("Erro", "Por favor, insira um Email válido.", "error");
         } else {
             try {
                 await api.post('/user', { 
@@ -60,7 +60,7 @@ const CadastrarPage = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label htmlFor="email" className="block text-gray-700 font-medium">Usuário:</label>
+                        <label htmlFor="email" className="block text-gray-700 font-medium">Email:</label>
                         <input 
                             name="email" 
                             type="email" 
