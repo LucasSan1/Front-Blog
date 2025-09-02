@@ -175,7 +175,8 @@ const PostBox = ({ searchTerm }) => {
                             <span className="font-semibold">{post.authorName}</span>
                             <span className="text-gray-500">| Categoria: {post.category}</span>
                         </div>
-                        {isLoggedIn && post.authorEmail === userEmail && (
+                       {isLoggedIn && (post.authorEmail?.toLowerCase() === userEmail?.toLowerCase() || 
+                                        post.authorName?.toLowerCase() === userEmail?.toLowerCase()) && (
                             <div className="flex items-center space-x-2">
                                 <span>{formatRelativeTime(post.dateTime)}</span>
                                 <button onClick={() => handleEditPost(post)} className="text-blue-500 text-sm">

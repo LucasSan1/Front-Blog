@@ -13,23 +13,15 @@ const LoginPage = () => {
     const enviar = (e) => {
         e.preventDefault();
 
-        const emailValidation = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-
         if (usuario.trim() === "" || senha.trim() === "") {
             Swal.fire({
                 icon: "warning",
                 title: "Campos obrigatórios",
                 text: "Por favor, preencha todos os campos.",
             });
-        } else if (!emailValidation.test(usuario)) {
-            Swal.fire({
-                icon: "error",
-                title: "Usuário inválido",
-                text: "Por favor, insira um usuário válido.",
-            });
         } else {
             api.post("/user/login", {
-                email: usuario,
+                user: usuario,
                 password: senha,
             })
             .then((response) => {
