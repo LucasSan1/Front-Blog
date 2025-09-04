@@ -26,6 +26,7 @@ const MainPage = () => {
             <NovoPost 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)} 
+                onCreate={() => window.location.reload()}
             />
         </>
     );
