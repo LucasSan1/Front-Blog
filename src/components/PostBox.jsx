@@ -280,7 +280,6 @@ const PostBox = ({ searchTerm }) => {
                     isOpen={isModalOpen}
                     onClose={handleModalClose}
                     onConfirm={handleConfirmDelete}
-                    onCreate={() => window.location.reload()}
                     message={itemType === 'post' ? "Tem certeza que deseja excluir este post e todos seus comentários?" : "Tem certeza que deseja excluir este comentário?"}
                 />
                 )}
