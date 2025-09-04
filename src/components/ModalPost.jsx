@@ -2,17 +2,18 @@ import React, { useState } from "react";
 import { api } from "../services/api";
 import Swal from "sweetalert2";
 
-const NovoPost = ({ isOpen, onClose, onCreate }) => {
+const NovoPost = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]); // array de arquivos
 
   if (!isOpen) return null;
 
   const handleCreate = async () => {
-    try {
+    let postId;
 
+    try {
       const res = await api.post(
         "/posts",
         { title, content, category },
@@ -23,21 +24,7 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
         }
       );
 
-      const postId = res.data.postId;
-
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("name", file.name);
-        formData.append("postId", postId);
-
-        await api.post("/images", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `${localStorage.getItem("Authorization")}`,
-          },
-        });
-      }
+      postId = res.data.postId;
 
       Swal.fire({
         title: "Sucesso!",
@@ -45,20 +32,52 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
         icon: "success",
         confirmButtonText: "OK",
       });
-
-      // Limpar campos
-      setTitle("");
-      setContent("");
-      setCategory("");
-      setFile(null);
-
-      onClose();
-      onCreate(); // opcional: atualizar lista de posts
-
     } catch (err) {
       console.log(err);
       Swal.fire("Erro", "Erro ao criar o post. Tente novamente.", "error");
+      return;
     }
+
+    if (files.length > 0) {
+      const failedFiles = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const formData = new FormData();
+        formData.append("files", files[i]);
+        formData.append("postId", postId);
+
+        try {
+          await api.post("/images", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `${localStorage.getItem("Authorization")}`,
+            },
+          });
+        } catch (err) {
+          console.log(`Falha ao enviar ${files[i].name}:`, err);
+          failedFiles.push(files[i].name);
+        }
+      }
+
+      if (failedFiles.length > 0) {
+        Swal.fire(
+          "Atenção",
+          `O post foi criado, mas as seguintes imagens não puderam ser enviadas:\n${failedFiles.join(
+            "\n"
+          )}`,
+          "warning"
+        );
+      } else {
+        Swal.fire("Sucesso", "Todas as imagens foram enviadas com sucesso!", "success");
+      }
+    }
+
+    // Limpar campos
+    setTitle("");
+    setContent("");
+    setCategory("");
+    setFiles([]);
+    onClose();
   };
 
   return (
@@ -89,11 +108,12 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
           onChange={(e) => setCategory(e.target.value)}
         />
 
-        <label className="block text-sm font-medium">Imagem (opcional)</label>
+        <label className="block text-sm font-medium">Imagens (opcional)</label>
         <input
           type="file"
           className="w-full mb-3"
-          onChange={(e) => setFile(e.target.files[0])}
+          multiple
+          onChange={(e) => setFiles([...e.target.files])}
         />
 
         <div className="flex justify-end space-x-2">
