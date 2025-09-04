@@ -219,7 +219,7 @@ const PostBox = ({ searchTerm }) => {
                         {post.imagesIds.map((imgId) => (
                         <img
                             key={imgId}
-                            src={`${api}/images/${imgId}`}
+                            src={`https://decent-gerladina-lucassan1-2434bea0.koyeb.app/images/${imgId}`}
                             alt={`Imagem ${imgId}`}
                             className="w-full h-32 object-cover rounded-md border"
                         />
