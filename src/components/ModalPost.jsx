@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { api } from "../services/api";
 import Swal from "sweetalert2";
 
-const NovoPost = ({ isOpen, onClose }) => {
+const NovoPost = ({ isOpen, onClose, onCreate }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
