@@ -43,7 +43,6 @@ const PostBox = ({ searchTerm }) => {
                 const email = JSON.parse(localStorage.getItem("user") || '""');
                 setUserEmail(email);
                 setIsLoggedIn(!!token);
-                console.log(res.data)
             })
             .catch((err) => Swal.fire("Erro", "Deu erro => " + err, "error"));
     }, []);
@@ -220,7 +219,7 @@ const PostBox = ({ searchTerm }) => {
                         {post.imagesIds.map((imgId) => (
                         <img
                             key={imgId}
-                            src={`http://localhost:8080/images/${imgId}`}
+                            src={`${api}/images/${imgId}`}
                             alt={`Imagem ${imgId}`}
                             className="w-full h-32 object-cover rounded-md border"
                         />

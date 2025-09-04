@@ -78,6 +78,7 @@ const NovoPost = ({ isOpen, onClose }) => {
     setCategory("");
     setFiles([]);
     onClose();
+    onCreate();
   };
 
   return (
