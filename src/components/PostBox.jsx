@@ -47,6 +47,7 @@ const PostBox = ({ searchTerm }) => {
             .catch((err) => Swal.fire("Erro", "Deu erro => " + err, "error"));
     }, []);
 
+    console.log("posts ", posts)
     useEffect(() => {
         const lowerCaseSearch = searchTerm.toLowerCase();
         setFilteredPosts(
@@ -68,6 +69,7 @@ const PostBox = ({ searchTerm }) => {
                 icon: "error",
                 title: err.response?.status === 401 ? "Você precisa estar logado para comentar!" : "Erro ao comentar!",
             });
+            console.error("Erro ao adicionar comentário:", err);
         });
         setNewComment("");
     };
@@ -219,7 +221,8 @@ const PostBox = ({ searchTerm }) => {
                         {post.imagesIds.map((imgId) => (
                         <img
                             key={imgId}
-                            src={`https://decent-gerladina-lucassan1-2434bea0.koyeb.app/images/${imgId}`}
+                            // src={`https://decent-gerladina-lucassan1-2434bea0.koyeb.app/images/${imgId}`}
+                            src={`http://localhost:8080/images/${imgId}`}
                             alt={`Imagem ${imgId}`}
                             className="w-full h-32 object-cover rounded-md border"
                         />
@@ -233,10 +236,11 @@ const PostBox = ({ searchTerm }) => {
                         <div className="space-y-4">
                         {post.comments && post.comments.length > 0 ? (
                             post.comments.map((comment) => (
-                            <div key={comment.id} className="border-b border-gray-300 pb-4">
+                            <div key={comment.id || comment.dateTime} className="border-b border-gray-300 pb-4">
                                 <div className="flex justify-between items-center">
-                                <span className="font-semibold text-gray-800">{comment.author_name}</span>
-                                {isLoggedIn && comment.author_email === userEmail && (
+                                <span className="font-semibold text-gray-800">{comment.authorName}</span>
+                                <span className="text-xs text-gray-500 ml-2">{formatRelativeTime(comment.dateTime)}</span>
+                                {isLoggedIn && comment.authorName === userEmail && (
                                     <div className="flex items-center space-x-2">
                                     <button onClick={() => handleEditComment(comment)} className="text-blue-500 text-sm">
                                         <FiEdit /> Editar
