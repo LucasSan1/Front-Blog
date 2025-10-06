@@ -34,6 +34,10 @@ const CadastrarPage = () => {
                 });
             } catch (error) {
                 console.log(error)
+                if (error.response && error.response.status === 400) {
+                    Swal.fire("Erro", error.response.data, "error");
+                    return;
+                }
                 Swal.fire("Erro", "Erro ao cadastrar. Tente novamente.", "error");
                 
             }
