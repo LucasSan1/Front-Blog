@@ -101,13 +101,13 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
 
-        <label className="block text-sm font-medium">Categoria</label>
+        {/* <label className="block text-sm font-medium">Categoria</label>
         <input
           type="text"
           className="w-full border p-2 rounded mb-3"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-        />
+        /> */}
 
         <label className="block text-sm font-medium">Imagens (opcional)</label>
         <input

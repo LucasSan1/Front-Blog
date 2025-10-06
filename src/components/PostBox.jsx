@@ -167,7 +167,7 @@ const PostBox = ({ searchTerm }) => {
                     <div className="flex justify-between text-sm text-gray-500 mb-4">
                         <div className="flex items-center space-x-2">
                         <span className="font-semibold">{post.authorName}</span>
-                        <span className="text-gray-500">| Categoria: {post.category}</span>
+                        {/* <span className="text-gray-500">| Categoria: {post.category}</span> */}
                         </div>
                         <span className="text-xs text-gray-500 ml-2">{formatRelativeTime(post.dateTime)}</span>
                         {isLoggedIn && (post.authorEmail?.toLowerCase() === userEmail?.toLowerCase() || 
