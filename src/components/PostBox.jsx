@@ -169,10 +169,10 @@ const PostBox = ({ searchTerm }) => {
                         <span className="font-semibold">{post.authorName}</span>
                         <span className="text-gray-500">| Categoria: {post.category}</span>
                         </div>
+                        <span className="text-xs text-gray-500 ml-2">{formatRelativeTime(post.dateTime)}</span>
                         {isLoggedIn && (post.authorEmail?.toLowerCase() === userEmail?.toLowerCase() || 
                                         post.authorName?.toLowerCase() === userEmail?.toLowerCase()) && (
                         <div className="flex items-center space-x-2">
-                            <span>{formatRelativeTime(post.dateTime)}</span>
                             <button onClick={() => handleEditPost(post)} className="text-blue-500 text-sm">
                             <FiEdit />
                             </button>
@@ -221,8 +221,8 @@ const PostBox = ({ searchTerm }) => {
                         {post.imagesIds.map((imgId) => (
                         <img
                             key={imgId}
-                            // src={`https://decent-gerladina-lucassan1-2434bea0.koyeb.app/images/${imgId}`}
-                            src={`http://localhost:8080/images/${imgId}`}
+                            src={`https://graceful-corly-sant422-5dd649ae.koyeb.app/images/${imgId}`}
+                            // src={`http://localhost:8080/images/${imgId}`}
                             alt={`Imagem ${imgId}`}
                             className="w-full h-32 object-cover rounded-md border"
                         />
