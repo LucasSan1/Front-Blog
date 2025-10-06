@@ -199,7 +199,7 @@ const PostBox = ({ searchTerm }) => {
                     {editingPost === post.id ? (
                         <div>
                         <textarea value={editedContent} onChange={(e) => setEditedContent(e.target.value)} className="w-full p-2 border rounded-lg"></textarea>
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                             <input
                             type="text"
                             value={editedCategory}
@@ -207,7 +207,7 @@ const PostBox = ({ searchTerm }) => {
                             className="w-full p-2 border rounded-lg"
                             placeholder="Categoria"
                             />
-                        </div>
+                        </div> */}
                         <button onClick={() => savePostEdit(post)} className="text-green-500 mx-2"><FiCheck /></button>
                         <button onClick={() => setEditingPost(null)} className="text-red-500"><FiX /></button>
                         </div>
