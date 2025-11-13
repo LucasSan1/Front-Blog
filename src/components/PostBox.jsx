@@ -366,9 +366,9 @@ const PostBox = ({ searchTerm }) => {
                           {formatRelativeTime(comment.dateTime)}
                         </span>
                         {isLoggedIn &&
-                          (post.authorEmail?.toLowerCase() ===
+                          (comment.authorEmail?.toLowerCase() ===
                             userEmail?.toLowerCase() ||
-                            post.authorName?.toLowerCase() ===
+                            comment.authorName?.toLowerCase() ===
                               userEmail?.toLowerCase()) && (
                             <div className="flex items-center space-x-2">
                               <button
