@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { api } from "../services/api";
 import Swal from "sweetalert2";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 const NovoPost = ({ isOpen, onClose, onCreate }) => {
   const [title, setTitle] = useState("");
@@ -9,7 +9,7 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
   const [category, setCategory] = useState("");
   const [files, setFiles] = useState([]); // array de arquivos
 
-  const token = Cookies.get('Authorization');
+  const token = Cookies.get("Authorization");
 
   if (!isOpen) return null;
 
@@ -36,16 +36,16 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
         confirmButtonText: "OK",
       });
     } catch (err) {
-        const status = err?.status;
-  
-        if(status == 400){
-          Swal.fire("Erro", err.response.data.message, "error")
-        } else{
-          Swal.fire("Erro", "Erro ao criar o post. Tente novamente.", "error");
-        }
+      const status = err?.status;
 
-        return;
+      if (status == 400) {
+        Swal.fire("Erro", err.response.data.message, "error");
+      } else {
+        Swal.fire("Erro", "Erro ao criar o post. Tente novamente.", "error");
       }
+
+      return;
+    }
 
     if (files.length > 0) {
       const failedFiles = [];
@@ -77,7 +77,11 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
           "warning"
         );
       } else {
-        Swal.fire("Sucesso", "Todas as imagens foram enviadas com sucesso!", "success");
+        Swal.fire(
+          "Sucesso",
+          "Todas as imagens foram enviadas com sucesso!",
+          "success"
+        );
       }
     }
 
@@ -118,24 +122,88 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
           onChange={(e) => setCategory(e.target.value)}
         /> */}
 
-        <label className="block text-sm font-medium">Imagens (opcional)</label>
-        <input
-          type="file"
-          className="w-full mb-3"
-          multiple
-          onChange={(e) => setFiles([...e.target.files])}
-        />
+        <label className="block text-sm font-medium mb-2">
+          Imagens (opcional)
+        </label>
+
+        <div
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            setFiles((prev) => [...prev, ...Array.from(e.dataTransfer.files)]);
+          }}
+          className="border-2 border-dashed border-gray-400 rounded-lg p-4 text-center hover:border-blue-500 transition-colors"
+        >
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            className="hidden"
+            id="file-upload"
+            onChange={(e) =>
+              setFiles((prev) => [...prev, ...Array.from(e.target.files)])
+            }
+          />
+
+          {files.length === 0 ? (
+            <label htmlFor="file-upload" className="block cursor-pointer">
+              <p className="text-gray-600">
+                Arraste e solte imagens aqui ou clique para selecionar
+              </p>
+              <span className="mt-2 inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                Selecionar imagens
+              </span>
+            </label>
+          ) : (
+            <div>
+              <div className="grid grid-cols-3 gap-3">
+                {files.map((file, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`preview-${index}`}
+                      className="w-full h-32 object-cover rounded-lg shadow-md border hover:scale-105 transition-transform duration-200"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white text-xs rounded-full px-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() =>
+                        setFiles((prev) => prev.filter((_, i) => i !== index))
+                      }
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-between items-center mt-4">
+                <label
+                  htmlFor="file-upload"
+                  className="cursor-pointer text-blue-600 text-sm underline hover:text-blue-800"
+                >
+                  Adicionar mais imagens
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => setFiles([])}
+                  className="text-red-600 text-sm underline hover:text-red-800"
+                >
+                  Remover todas
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="flex justify-end space-x-2">
-          <button
-            className="px-4 py-2 bg-gray-300 rounded"
-            onClick={onClose}
-          >
+          <button className="px-4 py-2 bg-gray-300 rounded" onClick={onClose}>
             Cancelar
           </button>
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            onClick={handleCreate} 
+            onClick={handleCreate}
           >
             Criar Post
           </button>
