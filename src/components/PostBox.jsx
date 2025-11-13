@@ -54,7 +54,6 @@ const PostBox = ({ searchTerm }) => {
       });
   }, []);
 
-  // console.log("posts ", posts)
   useEffect(() => {
     const lowerCaseSearch = searchTerm.toLowerCase();
     setFilteredPosts(
@@ -66,6 +65,8 @@ const PostBox = ({ searchTerm }) => {
     );
   }, [searchTerm, posts]);
 
+
+  // Função para adicionar novo comentario a um post
   const handleNewComment = (e, postID) => {
     e.preventDefault();
     api
@@ -90,6 +91,7 @@ const PostBox = ({ searchTerm }) => {
     setNewComment("");
   };
 
+  // Função para habilitar campos editaveis nos posts
   const handleEditPost = (post) => {
     setEditingPost(post.id);
     setEditedContent(post.content);
@@ -97,6 +99,7 @@ const PostBox = ({ searchTerm }) => {
     setEditedCategory(post.category);
   };
 
+  // Função para atualizar os posts
   const savePostEdit = (post) => {
     if (
       editedTitle === post.title &&
@@ -121,17 +124,19 @@ const PostBox = ({ searchTerm }) => {
         }
       )
       .then(() => window.location.reload())
-      .catch(() => {
+      .catch((err) => {
         Swal.fire("Erro", "Erro ao editar post", "error");
         console.log("Erro ao editar post: ", err);
       });
   };
 
+  // função para habilitar campos editaveis nos comentarios
   const handleEditComment = (comment) => {
     setEditingComment(comment.id);
     setEditedCommentContent(comment.content);
   };
 
+  // Função para salvar os comentarios depois de editados
   const saveCommentEdit = (comment) => {
     if (editedCommentContent === comment.content) {
       Swal.fire("Aviso", "Nenhuma mudança foi feita.", "info");
@@ -153,6 +158,7 @@ const PostBox = ({ searchTerm }) => {
       .catch(() => Swal.fire("Erro", "Erro ao editar comentário", "error"));
   };
 
+  // Função para deletar o post
   const deletePost = () => {
     if (itemToDelete && itemType === "post") {
       api
@@ -177,6 +183,8 @@ const PostBox = ({ searchTerm }) => {
     }
   };
 
+
+  // Função para deletar um comentario
   const deleteComment = () => {
     if (itemToDelete && itemType === "comment") {
       api
@@ -191,6 +199,8 @@ const PostBox = ({ searchTerm }) => {
     }
   };
 
+
+  // Função para deletar uma imagem
   const handleDeleteImage = async (imgId) => {
     try {
       const confirm = await Swal.fire({
@@ -217,12 +227,72 @@ const PostBox = ({ searchTerm }) => {
     }
   };
 
+  // Função para adicionar mais imagens aos posts
+  const handleAddImages = async (e, postId) => {
+    const token = Cookies.get("Authorization");
+    const files = Array.from(e.target.files);
+
+    if (files.length === 0) return;
+
+    const failedFiles = [];
+
+    try {
+      const confirm = await Swal.fire({
+        title: "Adicionar imagens?",
+        text: `Você está prestes a adicionar ${files.length} imagem(ns) ao post.`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sim, enviar!",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      for (let i = 0; i < files.length; i++) {
+        const formData = new FormData();
+        formData.append("files", files[i]);
+        formData.append("postId", postId);
+
+        try {
+          await api.post("/images", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `${token}`,
+            },
+          });
+        } catch (err) {
+          console.error(`Falha ao enviar ${files[i].name}:`, err);
+          failedFiles.push(files[i].name);
+        }
+      }
+
+      if (failedFiles.length > 0) {
+        Swal.fire(
+          "Aviso",
+          `Algumas imagens não puderam ser enviadas:\n${failedFiles.join(
+            "\n"
+          )}`,
+          "warning"
+        );
+      } else {
+        Swal.fire("Sucesso!", "Imagens adicionadas com sucesso!", "success");
+      }
+      
+      window.location.reload();
+    } catch (err) {
+      console.error("Erro geral ao enviar imagens:", err);
+      Swal.fire("Erro", "Não foi possível enviar as imagens!", "error");
+    }
+  };
+
+  // Função para fechar modal de novo post
   const handleModalClose = () => {
     setIsModalOpen(false);
     setItemToDelete(null);
     setItemType("");
   };
 
+  // Função para chamar modal de confirmação
   const handleConfirmDelete = () => {
     if (itemType === "post") deletePost();
     else if (itemType === "comment") deleteComment();
@@ -240,7 +310,6 @@ const PostBox = ({ searchTerm }) => {
             <div className="flex justify-between text-sm text-gray-500 mb-4">
               <div className="flex items-center space-x-2">
                 <span className="font-semibold">{post.authorName}</span>
-                {/* <span className="text-gray-500">| Categoria: {post.category}</span> */}
               </div>
               <span className="text-xs text-gray-500 ml-2">
                 {formatRelativeTime(post.dateTime)}
@@ -292,15 +361,7 @@ const PostBox = ({ searchTerm }) => {
                   onChange={(e) => setEditedContent(e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 ></textarea>
-                {/* <div className="mt-4">
-                            <input
-                            type="text"
-                            value={editedCategory}
-                            onChange={(e) => setEditedCategory(e.target.value)}
-                            className="w-full p-2 border rounded-lg"
-                            placeholder="Categoria"
-                            />
-                        </div> */}
+
                 <button
                   onClick={() => savePostEdit(post)}
                   className="text-green-500 mx-2"
@@ -326,7 +387,7 @@ const PostBox = ({ searchTerm }) => {
                     !deletedImages.includes(imgId) && (
                       <div key={imgId} className="relative group">
                         <img
-                         // src={`https://graceful-corly-sant422-5dd649ae.koyeb.app/images/${imgId}`}
+                          // src={`https://graceful-corly-sant422-5dd649ae.koyeb.app/images/${imgId}`}
                           src={`http://localhost:8080/images/${imgId}`}
                           alt={`Imagem ${imgId}`}
                           className="w-full h-32 object-cover rounded-md border"
@@ -343,6 +404,21 @@ const PostBox = ({ searchTerm }) => {
                       </div>
                     )
                 )}
+              </div>
+            )}
+
+            {editingPost === post.id && (
+              <div className="mt-4">
+                <label className="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-lg cursor-pointer hover:bg-green-700 transition">
+                  <span>Adicionar imagem</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleAddImages(e, post.id)}
+                    className="hidden"
+                  />
+                </label>
               </div>
             )}
 
