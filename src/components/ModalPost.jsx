@@ -41,7 +41,7 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
       if (status == 400) {
         Swal.fire("Aviso", err.response.data.message, "warning");
       } else if(status == 401){
-        Swal.fire("Aviso", "É preciso estar logado para postar!", "warning")
+        Swal.fire("É preciso estar logado para postar!", "", "warning")
       } else {
         Swal.fire("Erro", "Erro ao criar o post. Tente novamente.", "error");
       }

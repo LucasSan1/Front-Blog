@@ -14,9 +14,9 @@ const CadastrarPage = () => {
 
     const enviar = async () => {
         if (nome.trim() === "" || usuario.trim() === "" || senha.trim() === "") {
-            Swal.fire("Erro", "Por favor, preencha todos os campos.", "error");
+            Swal.fire("Campos Obrigatorios", "Por favor, preencha todos os campos.", "warning");
         } else if (!emailValidation.test(usuario)) {
-            Swal.fire("Erro", "Por favor, insira um Email válido.", "error");
+            Swal.fire("Email invalido", "Por favor, insira um Email válido.", "warning");
         } else {
             try {
                 await api.post('/user', { 

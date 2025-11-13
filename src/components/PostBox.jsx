@@ -214,11 +214,12 @@ const PostBox = ({ searchTerm }) => {
 
       if (!confirm.isConfirmed) return;
 
-      await api.delete("/images", {
+      const data = await api.delete("/images", {
         data: [imgId],
         headers: { Authorization: token },
       });
 
+      console.log("img ", data)
       Swal.fire("Deletado!", "Imagem removida com sucesso!", "success");
       setDeletedImages((prev) => [...prev, imgId]);
     } catch (err) {

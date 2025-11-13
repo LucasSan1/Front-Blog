@@ -32,7 +32,7 @@ const LoginPage = () => {
             .catch((erro) => {
                 if (erro.response?.status === 401) {
                     Swal.fire({
-                        icon: "error",
+                        icon: "Error",
                         title: "Usuário ou senha invalidas!"
                     });
                 }
