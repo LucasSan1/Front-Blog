@@ -53,9 +53,7 @@ export const api = axios.create({
 });
 ```
 
----
-
-## Executando o projeto
+## 4. Executando o projeto
 
 Rode o projeto com: 
 
