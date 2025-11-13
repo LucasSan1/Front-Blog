@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { api } from "../services/api";
 import Swal from "sweetalert2";
+import Cookies from 'js-cookie';
 
 const NovoPost = ({ isOpen, onClose, onCreate }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [files, setFiles] = useState([]); // array de arquivos
+
+  const token = Cookies.get('Authorization');
 
   if (!isOpen) return null;
 
@@ -19,7 +22,7 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
         { title, content, category },
         {
           headers: {
-            Authorization: `${localStorage.getItem("Authorization")}`,
+            Authorization: `${token}`,
           },
         }
       );
@@ -33,10 +36,16 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
         confirmButtonText: "OK",
       });
     } catch (err) {
-      console.log(err);
-      Swal.fire("Erro", "Erro ao criar o post. Tente novamente.", "error");
-      return;
-    }
+        const status = err?.status;
+  
+        if(status == 400){
+          Swal.fire("Erro", err.response.data.message, "error")
+        } else{
+          Swal.fire("Erro", "Erro ao criar o post. Tente novamente.", "error");
+        }
+
+        return;
+      }
 
     if (files.length > 0) {
       const failedFiles = [];
@@ -50,7 +59,7 @@ const NovoPost = ({ isOpen, onClose, onCreate }) => {
           await api.post("/images", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
-              Authorization: `${localStorage.getItem("Authorization")}`,
+              Authorization: `${token}`,
             },
           });
         } catch (err) {

@@ -2,6 +2,8 @@ import React, { useState, createContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import Swal from "sweetalert2"; 
+import Cookies from 'js-cookie';
+
 // Define o contexto
 export const AuthContext = createContext();
 
@@ -16,13 +18,19 @@ export const AuthProvider = ({ children }) => {
         if (usuario === undefined || token === undefined) {
             Swal.fire("Erro", "Não autenticado", "error");
         } else {
-            localStorage.setItem('user', JSON.stringify(usuario));
-            localStorage.setItem('Authorization', `Bearer ${token}`);
+            Cookies.set('Authorization', `Bearer ${token}`, {
+                expires: 0.5, // 0.5 dia = 12 horas
+                secure: true,
+                sameSite: 'Lax',
+            });
 
-            
+            Cookies.set('user', JSON.stringify(usuario), {
+                expires: 0.5, // 12 horas também
+                sameSite: 'Lax',
+            });
+         
             setUser(usuario);
 
-            console.log("Logado");
             Swal.fire("Sucesso", "Login realizado com sucesso!", "success");
             navigate("/");
         }
@@ -37,8 +45,8 @@ export const AuthProvider = ({ children }) => {
         })
         .then((res) => {
             Swal.fire("Sucesso", "Logout realizado", "success").then(() => {
-                localStorage.removeItem('user');
-                localStorage.removeItem('Authorization'); 
+                Cookies.remove('Authorization');
+                Cookies.remove('user');
                   
                 setUser(null);
                
@@ -53,8 +61,8 @@ export const AuthProvider = ({ children }) => {
 
     // Antes da página ser renderizada, verifica se o usúario ainda esta logado no localStorage
     useEffect(() => {
-        const usuarioRecuperado = localStorage.getItem("user");
-        const tokenRecuperado = localStorage.getItem("Authorization");
+        const usuarioRecuperado = Cookies.get("user");
+        const tokenRecuperado = Cookies.get('Authorization');
 
         if (usuarioRecuperado && tokenRecuperado) {
             setUser(JSON.parse(usuarioRecuperado));

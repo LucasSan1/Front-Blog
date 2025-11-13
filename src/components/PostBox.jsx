@@ -5,6 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { FiEdit, FiCheck, FiX, FiTrash2 } from "react-icons/fi";
 import ModalConfirmar from "./ModalConfirmar"; 
 import Swal from "sweetalert2";
+import Cookies from 'js-cookie';
 
 const formatRelativeTime = (dateString) => {
     if (!dateString) return "Data não disponível";
@@ -32,6 +33,8 @@ const PostBox = ({ searchTerm }) => {
     const [editedCommentContent, setEditedCommentContent] = useState("");
     const [filteredPosts, setFilteredPosts] = useState([]);
 
+    const token = Cookies.get('Authorization');
+
     useEffect(() => {
         api.get("/posts")
             .then((res) => {
@@ -39,15 +42,17 @@ const PostBox = ({ searchTerm }) => {
                 setPosts(fetchedPosts);
                 setFilteredPosts(fetchedPosts);
 
-                const token = localStorage.getItem("Authorization");
-                const email = JSON.parse(localStorage.getItem("user") || '""');
+                const email = JSON.parse(Cookies.get('user') || '{}');
                 setUserEmail(email);
                 setIsLoggedIn(!!token);
             })
-            .catch((err) => Swal.fire("Erro", "Deu erro => " + err, "error"));
+            .catch((err) => {
+                Swal.fire("Erro", "Erro ao buscar posts");
+                console.log("Erro ao buscar posts: ", err);
+            });
     }, []);
 
-    console.log("posts ", posts)
+    // console.log("posts ", posts)
     useEffect(() => {
         const lowerCaseSearch = searchTerm.toLowerCase();
         setFilteredPosts(
@@ -61,7 +66,7 @@ const PostBox = ({ searchTerm }) => {
     const handleNewComment = (e, postID) => {
         e.preventDefault();
         api.post(`/comments/${postID}`, { content: newComment }, {
-            headers: { Authorization: localStorage.getItem("Authorization") }
+            headers: { Authorization: token}
         })
         .then(() => window.location.reload())
         .catch((err) => {
@@ -93,9 +98,12 @@ const PostBox = ({ searchTerm }) => {
             content: editedContent || post.content,
             category: editedCategory || post.category,
         }, {
-            headers: { Authorization: localStorage.getItem("Authorization") }
+            headers: { Authorization: token }
         }).then(() => window.location.reload())
-          .catch(() => Swal.fire("Erro", "Erro ao editar post", "error"));
+          .catch(() => {
+            Swal.fire("Erro", "Erro ao editar post", "error")
+            console.log("Erro ao editar post: ", err);
+        });
     };
 
     const handleEditComment = (comment) => {
@@ -113,7 +121,7 @@ const PostBox = ({ searchTerm }) => {
         api.put(`/comments/${comment.id}`, {
             content: editedCommentContent || comment.content,
         }, {
-            headers: { Authorization: localStorage.getItem("Authorization") }
+            headers: { Authorization: token }
         }).then(() => window.location.reload())
           .catch(() => Swal.fire("Erro", "Erro ao editar comentário", "error"));
     };
@@ -121,7 +129,7 @@ const PostBox = ({ searchTerm }) => {
     const deletePost = () => {
         if (itemToDelete && itemType === 'post') {
             api.delete(`/posts/${itemToDelete.id}`, {
-                headers: { Authorization: localStorage.getItem("Authorization") }
+                headers: { Authorization: token }
             }).then(() => {
                 setIsModalOpen(false);
                 window.location.reload();
@@ -138,7 +146,7 @@ const PostBox = ({ searchTerm }) => {
     const deleteComment = () => {
         if (itemToDelete && itemType === 'comment') {
             api.delete(`/comments/${itemToDelete.id}`, {
-                headers: { Authorization: localStorage.getItem("Authorization") }
+                headers: { Authorization: token }
             }).then(() => {
                 setIsModalOpen(false);
                 window.location.reload();
@@ -177,7 +185,7 @@ const PostBox = ({ searchTerm }) => {
                             <FiEdit />
                             </button>
                             <button onClick={() => { setItemToDelete(post); setItemType('post'); setIsModalOpen(true); }} className="text-red-500 text-sm flex items-center">
-                            <FiTrash2 /> Excluir
+                            <FiTrash2 />
                             </button>
                         </div>
                         )}
@@ -221,8 +229,8 @@ const PostBox = ({ searchTerm }) => {
                         {post.imagesIds.map((imgId) => (
                         <img
                             key={imgId}
-                            src={`https://graceful-corly-sant422-5dd649ae.koyeb.app/images/${imgId}`}
-                            // src={`http://localhost:8080/images/${imgId}`}
+                            // src={`https://graceful-corly-sant422-5dd649ae.koyeb.app/images/${imgId}`}
+                            src={`http://localhost:8080/images/${imgId}`}
                             alt={`Imagem ${imgId}`}
                             className="w-full h-32 object-cover rounded-md border"
                         />
@@ -240,13 +248,14 @@ const PostBox = ({ searchTerm }) => {
                                 <div className="flex justify-between items-center">
                                 <span className="font-semibold text-gray-800">{comment.authorName}</span>
                                 <span className="text-xs text-gray-500 ml-2">{formatRelativeTime(comment.dateTime)}</span>
-                                {isLoggedIn && comment.authorName === userEmail && (
+                                {isLoggedIn && (post.authorEmail?.toLowerCase() === userEmail?.toLowerCase() || 
+                                        post.authorName?.toLowerCase() === userEmail?.toLowerCase()) && (
                                     <div className="flex items-center space-x-2">
                                     <button onClick={() => handleEditComment(comment)} className="text-blue-500 text-sm">
-                                        <FiEdit /> Editar
+                                        <FiEdit />
                                     </button>
                                     <button onClick={() => { setItemToDelete(comment); setItemType('comment'); setIsModalOpen(true); }} className="text-red-500 text-sm">
-                                        <FiTrash2 /> Excluir
+                                        <FiTrash2 />
                                     </button>
                                     </div>
                                 )}
