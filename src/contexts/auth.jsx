@@ -38,12 +38,6 @@ export const AuthProvider = ({ children }) => {
 
     // Função para logout do usuário e limpeza dos dados no localStorage
     const logout = () => {
-        api.post("/user/logout", {}, {
-            headers: {
-                Authorization: localStorage.getItem('Authorization')
-            }
-        })
-        .then((res) => {
             Swal.fire("Sucesso", "Logout realizado", "success").then(() => {
                 Cookies.remove('Authorization');
                 Cookies.remove('user');
@@ -52,11 +46,6 @@ export const AuthProvider = ({ children }) => {
                
                 window.location.reload();
             });
-        })
-        .catch((err) => {
-            Swal.fire("Erro", "Erro ao realizar logout: " + err, "error");
-            console.log(err);
-        });
     };
 
     // Antes da página ser renderizada, verifica se o usúario ainda esta logado no localStorage
