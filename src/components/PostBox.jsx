@@ -50,7 +50,7 @@ const PostBox = ({ searchTerm }) => {
       })
       .catch((err) => {
         Swal.fire("Erro", "Erro ao buscar posts");
-        console.log("Erro ao buscar posts: ", err);
+        console.log("Erro ao buscar posts: ", err.response);
       });
   }, []);
 
@@ -79,13 +79,13 @@ const PostBox = ({ searchTerm }) => {
       .then(() => window.location.reload())
       .catch((err) => {
         Swal.fire({
-          icon: "error",
+          icon: "warning",
           title:
             err.response?.status === 401
               ? "Você precisa estar logado para comentar!"
               : "Erro ao comentar!",
         });
-        console.error("Erro ao adicionar comentário:", err);
+        console.error("Erro ao adicionar comentário:", err.response);
       });
     setNewComment("");
   };
